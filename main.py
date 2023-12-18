@@ -90,8 +90,8 @@ class MainWindow(QMainWindow):
 
     def open_discord(self):
         try:
-            info_logger.info("https://discord.gg/P27b5qHDt9: Link opened")
-            url = "https://discord.gg/P27b5qHDt9"
+            info_logger.info("https://discord.gg/QpEHdyst5b: Link opened")
+            url = "https://discord.gg/QpEHdyst5b"
             webbrowser.open(url)
         except Exception as e:
             debug_logger.debug(f"ERROR: {str(e)}")
@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
             <font size=4><b>Developed By: Rajeshwaran</b></font> <br>
             <font size=4><b>Version: {__version__} ({CHANNEL})</b></font> <br>
             <br>
-            <a href="https://github.com/Rajeshwaran2001" target="_blank"><img src="{git}" height=25 alt="GitHub"> </a> &nbsp; <a href="https://discordapp.com/users/1138389183451381803" target="_blank"><img src="{discord}" height=25 alt="GitHub"> </a> &nbsp; <a href="https://forms.gle/xtVPKLcAKNUwY2WD6" target="_blank"><img src="{bug}" height=25 alt="GitHub"> </a> <br>
+            <a href="https://github.com/Rajeshwaran2001" target="_blank"><img src="{git}" height=25 alt="GitHub"> </a> &nbsp; <a href="https://discord.gg/QpEHdyst5b" target="_blank"><img src="{discord}" height=25 alt="Discord"> </a> &nbsp; <a href="https://forms.gle/xtVPKLcAKNUwY2WD6" target="_blank"><img src="{bug}" height=25 alt="BUG"> </a> <br>
             """
 
         about_dialog.setText(app_info)
