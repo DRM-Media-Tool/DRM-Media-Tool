@@ -82,6 +82,16 @@ self.info_logger.info("Key Added to Global Db")
 
 ```
 
+# Future Plans
+
+We have exciting plans for the future development of this project. Here's a glimpse of what's coming:
+
+- **Feature:** Include Support to decrypt Webm Files.
+- **Enhancement:** Include FFmpeg, mp4decrypt and Shaka packager.
+- **Upcoming:** Include Yt-dlp to Download files.
+
+I welcome contributions and feedback on these future plans. If you'd like to get involved or share your thoughts, please [open an issue](https://github.com/Rajeshwaran2001/DRM-Media-Tool/issues) or [reach out to me](discordapp.com/users/1138389183451381803).
+
 # Reference
 
 https://stackoverflow.com/questions/9913032/how-can-i-extract-audio-from-video-with-ffmpeg
