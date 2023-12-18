@@ -24,6 +24,7 @@ pip install -r requirements.txt
 # Build EXE
 
 - Create a .env File under assets dir with the below values
+> Any API Forked From Getwvkeys can be used
 
 ```
 API_URL = < API URL >
@@ -88,7 +89,7 @@ We have exciting plans for the future development of this project. Here's a glim
 
 - **Feature:** Include Support to decrypt Webm Files.
 - **Enhancement:** Include FFmpeg, mp4decrypt and Shaka packager.
-- **Upcoming:** Include Yt-dlp to Download files.
+- **Upcoming:** Include Yt-dlp to Download files & Add Support For Using of own CDM.
 
 I welcome contributions and feedback on these future plans. If you'd like to get involved or share your thoughts, please [open an issue](https://github.com/Rajeshwaran2001/DRM-Media-Tool/issues) or [reach out to me](discordapp.com/users/1138389183451381803).
 
