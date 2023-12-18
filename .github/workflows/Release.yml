@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Select the Channel (Stable, Beta)"
+        required: true
+        default: ""
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Create .env file
+        run: |
+          echo API_URL=${{ secrets.API_URL }} > assets\.env
+          echo X_API_KEY=${{ secrets.X_API_KEY }} >> assets\.env
+          echo '{
+            "type": "${{ secrets.type }}",
+            "project_id": "${{ secrets.project_id }}",
+            "private_key_id": "${{ secrets.private_key_id }}",
+            "private_key": "${{ secrets.private_key }}",
+            "client_email": "${{ secrets.client_email }}",
+            "client_id": "${{ secrets.client_id }}",
+            "auth_uri": "${{ secrets.auth_uri }}",
+            "token_uri": "${{ secrets.token_uri }}",
+            "auth_provider_x509_cert_url": "${{ secrets.auth_provider_x509_cert_url }}",
+            "client_x509_cert_url": "${{ secrets.client_x509_cert_url }}",
+            "universe_domain": "${{ secrets.universe_domain }}"
+          }' > assets/serviceAccountKey.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10.9
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -U pip setuptools wheel py2exe
+          pip install -U "https://rajeshwaran2001.github.io/Pyinstaller/x86_64/pyinstaller-6.3.0-py3-none-any.whl" -r requirements.txt
+          pip install -r requirements.txt
+
+      - name: Update Version
+        run: |
+          python update_version.py -c "${{ github.event.inputs.version }}"
+
+      - name: Build and Package
+        run: |
+          pyinstaller --onefile --add-data "assets;assets" --name="DRM & Media Tool" --windowed --icon=assets\\logo.ico main.py --noconsole
+
+      - name: Upload artifacts
+        id: create_release
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            dist/DRM & Media Tool.exe
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Get version from version.py
+        id: get_version
+        run: |
+          $APP_VERSION = Get-Content -Path ${{ github.workspace }}/version.py | Select-String -Pattern "__version__ = '(.*)'" | ForEach-Object { $_.Matches.Groups[1].Value }
+          Write-Host "APP_VERSION=$APP_VERSION"
+          echo "APP_VERSION=$APP_VERSION" >> $env:GITHUB_ENV
+
+      - name: Create Tag
+        run: |
+          git add .
+          git commit -m "Release ${{ env.APP_VERSION }}"
+          git push origin
+          git tag -a -m "Release ${{ env.APP_VERSION }}" ${{ env.APP_VERSION }}
+          git push origin --tags
+          
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/DRM & Media Tool.exe
+          tag_name: ${{ env.APP_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
