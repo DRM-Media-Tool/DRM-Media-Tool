@@ -24,7 +24,7 @@ pip install -r requirements.txt
 # Build EXE
 
 - Create a .env File under assets dir with the below values
-> Any API Forked From Getwvkeys can be used
+> Any API Forked From Getwvkeys can be used (cdrm-project, keysdb, getwvkeys & others).
 
 ```
 API_URL = < API URL >
