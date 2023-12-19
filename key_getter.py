@@ -139,7 +139,7 @@ class KeyGeter(QWidget):
             key = None
             # print(data)
             self.info_logger.info("API response is: %s", response)
-            if response.status_code == 302:
+            if response.status_code in [200, 302]:
                 if "keys" in data:
                     keys = data["keys"]
                     if isinstance(keys, list):
