@@ -91,8 +91,8 @@ class Decrypter(QWidget):
                 show_error_message(self, error_message)
                 self.debug_logger.debug(error_message)
         else:
-            show_error_message(self, "No Folder Selected.")
-            self.debug_logger.debug("No Folder Selected.")
+            show_error_message(self, "No Folder Found.")
+            self.debug_logger.debug("No Folder Found.")
 
     def decrypt_files(self):
         folder_path = self.folder_path_lineedit.text()
@@ -150,7 +150,7 @@ class Decrypter(QWidget):
         pattern = os.path.basename(folder_name)
         self.cursor.execute(query, (pattern,))
         results = self.cursor.fetchall()
-        keys = []
+        keys = False
 
         for result in results:
             rowid, movie_name = result
@@ -162,16 +162,20 @@ class Decrypter(QWidget):
             self.cursor.execute(keys_query, (rowid,))
             keys = self.cursor.fetchall()
 
-            if not keys:
-                # Customize this message as needed
-                error_message = "No key found in DB."
-                show_error_message(self, error_message)
-                self.debug_logger.debug(error_message)
-            else:
-                self.info_logger.info("Keys Found in Database")
+            if keys:
+                keys_found = True  # Set the flag if keys are found
                 for key in keys:
                     self.search_result_list.addItem(f"   Key: {key[0]}")
-        return bool(keys)
+
+        if not keys_found:
+            # Customize this message as needed
+            error_message = "No keys found in DB."
+            show_error_message(self, error_message)
+            self.debug_logger.debug(error_message)
+        else:
+            self.info_logger.info("Keys Found in Database")
+
+        return keys_found
 
     def decrypt_file(self, folder_name):
         self.search_result_list.clear()
