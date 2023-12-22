@@ -101,13 +101,6 @@ class KeyGeter(QWidget):
         )
         ''')
 
-        # Insert the values into the table
-        cursor.execute("INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)",
-                       (pssh, license_url, name))
-
-        conn.commit()
-        pssh_id = cursor.lastrowid
-
         # Construct the API request
         base_url = os.getenv("API_URL")
         path = "/v2/api/"
@@ -150,6 +143,11 @@ class KeyGeter(QWidget):
                                     self.debug_logger.debug("Error")
                                     continue
                             cursor.execute(
+                                "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+
+                            conn.commit()
+                            pssh_id = cursor.lastrowid
+                            cursor.execute(
                                 "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
                             # print("One key found")
                             self.info_logger.info("Single key found")
@@ -164,6 +162,11 @@ class KeyGeter(QWidget):
                             # print("Multiple keys found")
                             self.info_logger.info("Multiple keys found")
                             key_strings = keys
+                            cursor.execute(
+                                "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+
+                            conn.commit()
+                            pssh_id = cursor.lastrowid
                             for key_string in key_strings:
                                 key = key_string.replace(
                                     '[', '').replace(']', '').replace("'", "")
@@ -171,6 +174,11 @@ class KeyGeter(QWidget):
                                     "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
                     else:
                         key = keys
+                        cursor.execute(
+                            "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+
+                        conn.commit()
+                        pssh_id = cursor.lastrowid
                         cursor.execute(
                             "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
                         self.info_logger.info("Keys Found")
