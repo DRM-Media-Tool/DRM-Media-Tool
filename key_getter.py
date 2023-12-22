@@ -4,7 +4,7 @@ import requests
 import json
 import os
 from helper.message import show_error_message
-from datetime import datetime
+from popup.upload_cdm import UploadCDMDialog
 from dotenv import load_dotenv
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -48,16 +48,19 @@ class KeyGeter(QWidget):
         layout.addLayout(row_layout3)
 
         # Create a button
-        button = QPushButton('Submit')
+        buttons_layout = QHBoxLayout()
 
-        # Add labels, input fields, and button to the layout
-        layout.addWidget(button)
+        submit_button = QPushButton('Submit')
+        submit_button.clicked.connect(self.handle_submit_click)
+        buttons_layout.addWidget(submit_button)
+
+        upload_cdm_button = QPushButton('Upload CDM')
+        upload_cdm_button.clicked.connect(self.handle_upload_cdm_click)
+        buttons_layout.addWidget(upload_cdm_button)
 
         # Set the layout for the main window
         self.setLayout(layout)
-
-        # Connect the button to a function (e.g., handle_button_click)
-        button.clicked.connect(self.handle_button_click)
+        layout.addLayout(buttons_layout)
 
         # Create a text browser to display the API response
         self.response_browser = QTextBrowser()
@@ -67,7 +70,12 @@ class KeyGeter(QWidget):
 
         self.show()
 
-    def handle_button_click(self):
+    def handle_upload_cdm_click(self):
+        upload_cdm_dialog = UploadCDMDialog(
+            self.debug_logger, self.info_logger)
+        upload_cdm_dialog.exec_()
+
+    def handle_submit_click(self):
         self.info_logger.info("Submit Button Clicked")
         # Get user input from the input fields
         pssh = self.input1.text()
@@ -100,7 +108,6 @@ class KeyGeter(QWidget):
         FOREIGN KEY (pssh_id) REFERENCES pssh (pssh_id)
         )
         ''')
-
         # Construct the API request
         base_url = os.getenv("API_URL")
         path = "/v2/api/"
