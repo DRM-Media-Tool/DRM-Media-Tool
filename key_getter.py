@@ -5,17 +5,11 @@ import json
 import os
 from helper.message import show_error_message
 from datetime import datetime
-from firebase_admin import credentials, firestore, initialize_app
 from dotenv import load_dotenv
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 dotenv_path = os.path.join(current_dir, "assets", ".env")
-key_path = os.path.join(current_dir, 'assets', 'serviceAccountKey.json')
 load_dotenv(dotenv_path)
-# Initialize Firebase
-cred = credentials.Certificate(key_path)
-firebase_app = initialize_app(cred)
-db = firestore.client()
 
 
 class KeyGeter(QWidget):
@@ -115,7 +109,9 @@ class KeyGeter(QWidget):
         pssh_id = cursor.lastrowid
 
         # Construct the API request
-        api_url = os.getenv("API_URL")
+        base_url = os.getenv("API_URL")
+        path = "/v2/api/"
+        api_url = f"{base_url.rstrip('/')}{path}"
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (Ktesttemp, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
             "Content-Type": "application/json",
@@ -130,6 +126,7 @@ class KeyGeter(QWidget):
             payload = {
                 "license_url": license_url,
                 "pssh": pssh,
+                "force": True
             }
 
             # Make the API request
@@ -150,7 +147,7 @@ class KeyGeter(QWidget):
                                 elif isinstance(key_info, dict) and "key" in key_info:
                                     key = key_info["key"]
                                 else:
-                                    print('error')
+                                    self.debug_logger.debug("Error")
                                     continue
                             cursor.execute(
                                 "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
@@ -193,27 +190,12 @@ class KeyGeter(QWidget):
                 show_error_message(self, error_message)
                 self.info_logger.info(error_message)
 
-            current_datetime = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
-            event_data = {
-                'pssh': pssh,
-                'license_url': license_url,
-                'movie_name': name,
-                'keys': keys if "keys" in data else [],
-                'datetime': current_datetime,
-            }
-
-            # 'events' is the name of the collection
-            events_ref = db.collection('events')
-            events_ref.add(event_data)
-
-            self.info_logger.info("Key Added to Globa Db")
-
             # Display the API response in the text browser
             conn.commit()
             # Close the database connection
             conn.close()
             if key is not None:
-                key_str = json.dumps(keys)
+                key_str = json.dumps(key)
                 self.response_browser.setText(key_str)
                 # Clear the input fields
                 self.input1.clear()
