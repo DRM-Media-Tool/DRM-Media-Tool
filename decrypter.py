@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit
 import os
 import sqlite3
 import subprocess
-from file_merger_dialog import FileMergerDialog
+from popup.file_merger_dialog import FileMergerDialog
 from helper.message import show_error_message, show_success_message
 
 
