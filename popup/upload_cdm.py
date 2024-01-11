@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QLineEdit, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QGridLayout, QLabel, QComboBox, QLineEdit, QPushButton, QFileDialog, QHBoxLayout
 
 
 class UploadCDMDialog(QDialog):
@@ -13,27 +13,31 @@ class UploadCDMDialog(QDialog):
 
         main_layout = QVBoxLayout()
 
-        api_layout = QHBoxLayout()
+        api_layout = QGridLayout()
+        api_layout.setSpacing(5)  # Adjust the spacing here
+
         api_label = QLabel('Select API:')
         self.api_dropdown = QComboBox()
-        api_layout.addWidget(api_label)
-        api_layout.addWidget(self.api_dropdown)
+        api_layout.addWidget(api_label, 0, 0)
+        api_layout.addWidget(self.api_dropdown, 0, 1)
 
-        device_id_layout = QHBoxLayout()
+        device_id_layout = QGridLayout()
+        device_id_layout.setSpacing(5)  # Adjust the spacing here
+
         device_id_label = QLabel('Device ID:')
-        self.device_id_edit = QLineEdit()
         device_id_upload_button = QPushButton('Upload File')
         device_id_upload_button.clicked.connect(self.upload_device_id_file)
-        device_id_layout.addWidget(device_id_label)
-        device_id_layout.addWidget(device_id_upload_button)
+        device_id_layout.addWidget(device_id_label, 1, 0)
+        device_id_layout.addWidget(device_id_upload_button, 1, 1)
 
-        private_key_layout = QHBoxLayout()
+        private_key_layout = QGridLayout()
+        private_key_layout.setSpacing(5)  # Adjust the spacing here
+
         private_key_label = QLabel('Private Key:')
-        self.private_key_edit = QLineEdit()
         private_key_upload_button = QPushButton('Upload File')
         private_key_upload_button.clicked.connect(self.upload_private_key_file)
-        private_key_layout.addWidget(private_key_label)
-        private_key_layout.addWidget(private_key_upload_button)
+        private_key_layout.addWidget(private_key_label, 2, 0)
+        private_key_layout.addWidget(private_key_upload_button, 2, 1)
 
         submit_layout = QHBoxLayout()
         submit_button = QPushButton('Submit')
@@ -44,7 +48,6 @@ class UploadCDMDialog(QDialog):
         main_layout.addLayout(device_id_layout)
         main_layout.addLayout(private_key_layout)
         main_layout.addLayout(submit_layout)
-
         self.setLayout(main_layout)
 
     def upload_device_id_file(self):
