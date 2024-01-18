@@ -188,7 +188,7 @@ class FileMergerDialog(QDialog):
                 "episode", os.path.basename(self.folder_path))
             release_year = metadata.get("release_year", "")
             release_year_suffix = f' ({release_year})' if release_year else ''
-            output_file = f'{episode_name.replace(":", " ")} {release_year_suffix}{extension}'
+            output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix}{extension}'
             # Handle the case where the file already exists
             co = 1
             while os.path.exists(os.path.join(self.folder_path, output_file)):
@@ -198,7 +198,7 @@ class FileMergerDialog(QDialog):
                 release_year = metadata.get("release_year", "")
                 release_year_suffix = f' ({release_year})' if release_year else ''
 
-                output_file = f'{episode_name.replace(":", " ")} {release_year_suffix} ({co}){extension}'
+                output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix} ({co}){extension}'
                 co += 1
 
             # Determine subtitle codec based on video format
