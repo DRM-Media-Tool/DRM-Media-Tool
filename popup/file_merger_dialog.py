@@ -97,7 +97,7 @@ class FileMergerDialog(QDialog):
                 selected_files.append((file_name, file_type))
 
         # Check if there are at least one video and one audio file selected
-        if any(file_type == 'Video' for (_, file_type) in selected_files) and \
+        if any(file_type == 'Video' for (_, file_type) in selected_files) or \
                 any(file_type == 'Audio' for (_, file_type) in selected_files):
 
             # Get all files in the directory ending with .info.json
