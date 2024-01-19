@@ -137,7 +137,6 @@ class FileMergerDialog(QDialog):
                 self.debug_logger.debug("Error: No Subtitle files found.")
             if img_files:
                 thumbnail_file = os.path.join(self.folder_path, img_files[0])
-
             else:
                 print("No matching files found.")
                 self.debug_logger.debug("No matching files found.")
@@ -188,7 +187,7 @@ class FileMergerDialog(QDialog):
                 "episode", os.path.basename(self.folder_path))
             release_year = metadata.get("release_year", "")
             release_year_suffix = f' ({release_year})' if release_year else ''
-            output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix}{extension}'
+            output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix}.mp4'
             # Handle the case where the file already exists
             co = 1
             while os.path.exists(os.path.join(self.folder_path, output_file)):
@@ -198,19 +197,10 @@ class FileMergerDialog(QDialog):
                 release_year = metadata.get("release_year", "")
                 release_year_suffix = f' ({release_year})' if release_year else ''
 
-                output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix} ({co}){extension}'
+                output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix} ({co}).mp4'
                 co += 1
 
-            # Determine subtitle codec based on video format
-            if extension.lower() == '.mkv':
-                subtitle_codec = 'srt'
-            elif extension.lower() == '.mp4':
-                subtitle_codec = 'mov_text'
-            else:
-                subtitle_codec = 'webvtt'
-
             # Convert the genres to a string with semicolons as separators
-            # print(subtitle_codec)
             if "genre" in metadata:
                 genre_string = ';'.join(metadata["genre"])
                 # Rest of your code using genre_string
@@ -224,7 +214,7 @@ class FileMergerDialog(QDialog):
             ffmpeg_command += (
                 f'-c:v copy '
                 f'-c:a copy '
-                f'-c:s {subtitle_codec} '  # Use the determined subtitle codec
+                f'-c:s mov_text '  # Use the determined subtitle codec
                 f'-c:v:1 png '
             )
             ffmpeg_command += ''.join(metadata_strings_array)
@@ -257,6 +247,8 @@ class FileMergerDialog(QDialog):
 
             ffmpeg_command += (
                 ' -disposition:v:1 attached_pic '  # Set subtitle stream as default
+                f'-movflags +faststart '  # Enable faststart for streaming
+                f'-strict experimental '  # Necessary for using the AAC codec
                 f'"{os.path.join(self.folder_path, output_file)}"'
             )
 
