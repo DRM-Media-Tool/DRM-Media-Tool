@@ -227,14 +227,21 @@ class FileMergerDialog(QDialog):
                 )
             else:
                 ffmpeg_command += (
-                    f'-metadata title="{metadata.get("episode", " ")}" '
-                    f'-metadata comment="{metadata.get("description", "")}" '
-                    f'-metadata COPYRIGHT="{metadata.get("extractor_key", "")}" '
-                    f'-metadata Artist="{metadata.get("extractor_key", "")}" '
-                    f'-metadata date="{metadata.get("release_year", "")}" '
-                    f'-metadata genre="{genre_string}" '
-                    f'-metadata handler_name="Amazon Prime Video" '
-                    f'-metadata encoder="FFmpeg" '
+                    '-metadata title="{}" '
+                    '-metadata comment="{}" '
+                    '-metadata COPYRIGHT="{}" '
+                    '-metadata Artist="{}" '
+                    '-metadata date="{}" '
+                    '-metadata genre="{}" '
+                    '-metadata handler_name="Amazon Prime Video" '
+                    '-metadata encoder="FFmpeg" '
+                ).format(
+                    metadata.get("episode", ""),
+                    metadata.get("description", "").replace("\"", ""),
+                    metadata.get("extractor_key", ""),
+                    metadata.get("extractor_key", ""),
+                    metadata.get("release_year", ""),
+                    genre_string,
                 )
 
             ffmpeg_command += (
