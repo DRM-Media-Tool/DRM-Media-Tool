@@ -95,7 +95,7 @@ class KeyGeter(QWidget):
         pssh = self.input1.text()
         license_url = self.input2.text()
         name = self.input3.text()
-        headers = self.input4.text()
+        header = self.input4.toPlainText()
         proxy = self.input5.text()
         # Check if any field is empty
         if not name:
@@ -110,7 +110,7 @@ class KeyGeter(QWidget):
         if not proxy:
             self.info_logger.info("proxy Field is Empty")
 
-        if not headers:
+        if not header:
             self.info_logger.info("headers Field is Empty")
 
         conn = sqlite3.connect('db.db')
@@ -148,8 +148,11 @@ class KeyGeter(QWidget):
             payload = {
                 "license_url": license_url,
                 "pssh": pssh,
+                "proxy": proxy,
+                "headers": header,
                 "force": True
             }
+            print(payload)
 
             # Make the API request
             response = requests.post(api_url, headers=headers, json=payload)
