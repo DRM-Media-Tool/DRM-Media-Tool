@@ -27,9 +27,11 @@ class KeyGeter(QWidget):
         label1 = QLabel('PSSH:')
         label2 = QLabel('Licence URL:')
         label3 = QLabel('Name:')
+        label4 = QLabel('Proxy:')
         self.input1 = QLineEdit()
         self.input2 = QLineEdit()
         self.input3 = QLineEdit()
+        self.input4 = QLineEdit()
 
         # To have input and lable on same line
         row_layout1 = QHBoxLayout()
@@ -46,6 +48,11 @@ class KeyGeter(QWidget):
         row_layout3.addWidget(label3)
         row_layout3.addWidget(self.input3)
         layout.addLayout(row_layout3)
+
+        row_layout4 = QHBoxLayout()
+        row_layout4.addWidget(label4)
+        row_layout4.addWidget(self.input4)
+        layout.addLayout(row_layout4)
 
         # Create a button
         buttons_layout = QHBoxLayout()
@@ -81,6 +88,7 @@ class KeyGeter(QWidget):
         pssh = self.input1.text()
         license_url = self.input2.text()
         name = self.input3.text()
+        proxy = self.input4.text()
         # Check if any field is empty
         if not name:
             self.info_logger.info("Name Field is Empty")
@@ -90,6 +98,9 @@ class KeyGeter(QWidget):
 
         if not license_url:
             self.info_logger.info("license_url Field is Empty")
+
+        if not proxy:
+            self.info_logger.info("proxy Field is Empty")
 
         conn = sqlite3.connect('db.db')
         self.info_logger.info("DB Connected Succesfully")
@@ -110,7 +121,7 @@ class KeyGeter(QWidget):
         ''')
         # Construct the API request
         base_url = os.getenv("API_URL")
-        path = "/v2/api/"
+        path = "/api"
         api_url = f"{base_url.rstrip('/')}{path}"
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (Ktesttemp, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
