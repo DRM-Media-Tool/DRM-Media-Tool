@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QTextBrowser
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QTextBrowser, QPlainTextEdit
 import sqlite3
 import requests
 import json
@@ -27,11 +27,13 @@ class KeyGeter(QWidget):
         label1 = QLabel('PSSH:')
         label2 = QLabel('Licence URL:')
         label3 = QLabel('Name:')
-        label4 = QLabel('Proxy:')
+        label4 = QLabel('Headers:')
+        label5 = QLabel('Proxy:')
         self.input1 = QLineEdit()
         self.input2 = QLineEdit()
         self.input3 = QLineEdit()
-        self.input4 = QLineEdit()
+        self.input4 = QPlainTextEdit()
+        self.input5 = QLineEdit()
 
         # To have input and lable on same line
         row_layout1 = QHBoxLayout()
@@ -49,10 +51,15 @@ class KeyGeter(QWidget):
         row_layout3.addWidget(self.input3)
         layout.addLayout(row_layout3)
 
-        row_layout4 = QHBoxLayout()
-        row_layout4.addWidget(label4)
-        row_layout4.addWidget(self.input4)
-        layout.addLayout(row_layout4)
+        vertical_layout = QVBoxLayout()
+        vertical_layout.addWidget(label4)
+        vertical_layout.addWidget(self.input4)
+        layout.addLayout(vertical_layout)
+
+        row_layout5 = QHBoxLayout()
+        row_layout5.addWidget(label5)
+        row_layout5.addWidget(self.input5)
+        layout.addLayout(row_layout5)
 
         # Create a button
         buttons_layout = QHBoxLayout()
@@ -88,7 +95,8 @@ class KeyGeter(QWidget):
         pssh = self.input1.text()
         license_url = self.input2.text()
         name = self.input3.text()
-        proxy = self.input4.text()
+        headers = self.input4.text()
+        proxy = self.input5.text()
         # Check if any field is empty
         if not name:
             self.info_logger.info("Name Field is Empty")
@@ -101,6 +109,9 @@ class KeyGeter(QWidget):
 
         if not proxy:
             self.info_logger.info("proxy Field is Empty")
+
+        if not headers:
+            self.info_logger.info("headers Field is Empty")
 
         conn = sqlite3.connect('db.db')
         self.info_logger.info("DB Connected Succesfully")
@@ -170,14 +181,6 @@ class KeyGeter(QWidget):
                             # print("One key found")
                             self.info_logger.info("Single key found")
                         else:
-                            # key_strings = keys
-                            # key_string = ', '.join(key_strings)
-                            # part = key_string.replace(
-                            #     '[', '').replace(']', '').replace("'", "")
-                            # key_parts = part.split(', ')
-                            # key = "\n".join(key_parts)
-                            # print(key)
-                            # print("Multiple keys found")
                             self.info_logger.info("Multiple keys found")
                             key_strings = keys
                             cursor.execute(
