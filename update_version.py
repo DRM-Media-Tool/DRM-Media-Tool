@@ -42,11 +42,11 @@ if not existing_version:
     # First time, use base version
     new_version = base_version
 else:
-    # Append random 4-digit increment for Beta channel or use base version for Stable channel
+    # Append random 4-digit increment
     if channel == "Beta":
         new_version = f"{base_version}.{random.randint(1000, 9999)}"
     else:
-        new_version = f"{base_version}.{random.randint(1000, 9999)}"
+        new_version = f"{base_version}.{random.randint(10, 99)}"
 
 # Update version.py file
 with open(file_path, "w") as f:

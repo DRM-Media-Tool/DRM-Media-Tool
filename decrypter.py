@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit
 import os
 import sqlite3
 import subprocess
-from file_merger_dialog import FileMergerDialog
+from popup.file_merger_dialog import FileMergerDialog
 from helper.message import show_error_message, show_success_message
 
 
@@ -150,7 +150,7 @@ class Decrypter(QWidget):
         pattern = os.path.basename(folder_name)
         self.cursor.execute(query, (pattern,))
         results = self.cursor.fetchall()
-        keys = False
+        keys = []
 
         for result in results:
             rowid, movie_name = result
@@ -162,20 +162,16 @@ class Decrypter(QWidget):
             self.cursor.execute(keys_query, (rowid,))
             keys = self.cursor.fetchall()
 
-            if keys:
-                keys_found = True  # Set the flag if keys are found
+            if not keys:
+                # Customize this message as needed
+                error_message = "No key found in DB."
+                show_error_message(self, error_message)
+                self.debug_logger.debug(error_message)
+            else:
+                self.info_logger.info("Keys Found in Database")
                 for key in keys:
                     self.search_result_list.addItem(f"   Key: {key[0]}")
-
-        if not keys_found:
-            # Customize this message as needed
-            error_message = "No keys found in DB."
-            show_error_message(self, error_message)
-            self.debug_logger.debug(error_message)
-        else:
-            self.info_logger.info("Keys Found in Database")
-
-        return keys_found
+        return bool(keys)
 
     def decrypt_file(self, folder_name):
         self.search_result_list.clear()

@@ -1,21 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QTextBrowser
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QTextBrowser, QPlainTextEdit
 import sqlite3
 import requests
 import json
 import os
 from helper.message import show_error_message
-from datetime import datetime
-from firebase_admin import credentials, firestore, initialize_app
+from popup.upload_cdm import UploadCDMDialog
 from dotenv import load_dotenv
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 dotenv_path = os.path.join(current_dir, "assets", ".env")
-key_path = os.path.join(current_dir, 'assets', 'serviceAccountKey.json')
 load_dotenv(dotenv_path)
-# Initialize Firebase
-cred = credentials.Certificate(key_path)
-firebase_app = initialize_app(cred)
-db = firestore.client()
 
 
 class KeyGeter(QWidget):
@@ -33,9 +27,13 @@ class KeyGeter(QWidget):
         label1 = QLabel('PSSH:')
         label2 = QLabel('Licence URL:')
         label3 = QLabel('Name:')
+        label4 = QLabel('Headers:')
+        label5 = QLabel('Proxy:')
         self.input1 = QLineEdit()
         self.input2 = QLineEdit()
         self.input3 = QLineEdit()
+        self.input4 = QPlainTextEdit()
+        self.input5 = QLineEdit()
 
         # To have input and lable on same line
         row_layout1 = QHBoxLayout()
@@ -53,17 +51,30 @@ class KeyGeter(QWidget):
         row_layout3.addWidget(self.input3)
         layout.addLayout(row_layout3)
 
-        # Create a button
-        button = QPushButton('Submit')
+        vertical_layout = QVBoxLayout()
+        vertical_layout.addWidget(label4)
+        vertical_layout.addWidget(self.input4)
+        layout.addLayout(vertical_layout)
 
-        # Add labels, input fields, and button to the layout
-        layout.addWidget(button)
+        row_layout5 = QHBoxLayout()
+        row_layout5.addWidget(label5)
+        row_layout5.addWidget(self.input5)
+        layout.addLayout(row_layout5)
+
+        # Create a button
+        buttons_layout = QHBoxLayout()
+
+        submit_button = QPushButton('Submit')
+        submit_button.clicked.connect(self.handle_submit_click)
+        buttons_layout.addWidget(submit_button)
+
+        upload_cdm_button = QPushButton('Upload CDM')
+        upload_cdm_button.clicked.connect(self.handle_upload_cdm_click)
+        buttons_layout.addWidget(upload_cdm_button)
 
         # Set the layout for the main window
         self.setLayout(layout)
-
-        # Connect the button to a function (e.g., handle_button_click)
-        button.clicked.connect(self.handle_button_click)
+        layout.addLayout(buttons_layout)
 
         # Create a text browser to display the API response
         self.response_browser = QTextBrowser()
@@ -73,12 +84,19 @@ class KeyGeter(QWidget):
 
         self.show()
 
-    def handle_button_click(self):
+    def handle_upload_cdm_click(self):
+        upload_cdm_dialog = UploadCDMDialog(
+            self.debug_logger, self.info_logger)
+        upload_cdm_dialog.exec_()
+
+    def handle_submit_click(self):
         self.info_logger.info("Submit Button Clicked")
         # Get user input from the input fields
         pssh = self.input1.text()
         license_url = self.input2.text()
         name = self.input3.text()
+        header = self.input4.toPlainText()
+        proxy = self.input5.text()
         # Check if any field is empty
         if not name:
             self.info_logger.info("Name Field is Empty")
@@ -88,6 +106,12 @@ class KeyGeter(QWidget):
 
         if not license_url:
             self.info_logger.info("license_url Field is Empty")
+
+        if not proxy:
+            self.info_logger.info("proxy Field is Empty")
+
+        if not header:
+            self.info_logger.info("headers Field is Empty")
 
         conn = sqlite3.connect('db.db')
         self.info_logger.info("DB Connected Succesfully")
@@ -106,16 +130,10 @@ class KeyGeter(QWidget):
         FOREIGN KEY (pssh_id) REFERENCES pssh (pssh_id)
         )
         ''')
-
-        # Insert the values into the table
-        cursor.execute("INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)",
-                       (pssh, license_url, name))
-
-        conn.commit()
-        pssh_id = cursor.lastrowid
-
         # Construct the API request
-        api_url = os.getenv("API_URL")
+        base_url = os.getenv("API_URL")
+        path = "/api"
+        api_url = f"{base_url.rstrip('/')}{path}"
         headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (Ktesttemp, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
             "Content-Type": "application/json",
@@ -130,7 +148,11 @@ class KeyGeter(QWidget):
             payload = {
                 "license_url": license_url,
                 "pssh": pssh,
+                "proxy": proxy,
+                "headers": header,
+                "force": True
             }
+            print(payload)
 
             # Make the API request
             response = requests.post(api_url, headers=headers, json=payload)
@@ -150,23 +172,25 @@ class KeyGeter(QWidget):
                                 elif isinstance(key_info, dict) and "key" in key_info:
                                     key = key_info["key"]
                                 else:
-                                    print('error')
+                                    self.debug_logger.debug("Error")
                                     continue
+                            cursor.execute(
+                                "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+
+                            conn.commit()
+                            pssh_id = cursor.lastrowid
                             cursor.execute(
                                 "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
                             # print("One key found")
                             self.info_logger.info("Single key found")
                         else:
-                            # key_strings = keys
-                            # key_string = ', '.join(key_strings)
-                            # part = key_string.replace(
-                            #     '[', '').replace(']', '').replace("'", "")
-                            # key_parts = part.split(', ')
-                            # key = "\n".join(key_parts)
-                            # print(key)
-                            # print("Multiple keys found")
                             self.info_logger.info("Multiple keys found")
                             key_strings = keys
+                            cursor.execute(
+                                "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+
+                            conn.commit()
+                            pssh_id = cursor.lastrowid
                             for key_string in key_strings:
                                 key = key_string.replace(
                                     '[', '').replace(']', '').replace("'", "")
@@ -174,6 +198,11 @@ class KeyGeter(QWidget):
                                     "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
                     else:
                         key = keys
+                        cursor.execute(
+                            "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+
+                        conn.commit()
+                        pssh_id = cursor.lastrowid
                         cursor.execute(
                             "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
                         self.info_logger.info("Keys Found")
@@ -193,27 +222,12 @@ class KeyGeter(QWidget):
                 show_error_message(self, error_message)
                 self.info_logger.info(error_message)
 
-            current_datetime = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
-            event_data = {
-                'pssh': pssh,
-                'license_url': license_url,
-                'movie_name': name,
-                'keys': keys if "keys" in data else [],
-                'datetime': current_datetime,
-            }
-
-            # 'events' is the name of the collection
-            events_ref = db.collection('events')
-            events_ref.add(event_data)
-
-            self.info_logger.info("Key Added to Globa Db")
-
             # Display the API response in the text browser
             conn.commit()
             # Close the database connection
             conn.close()
             if key is not None:
-                key_str = json.dumps(keys)
+                key_str = json.dumps(key)
                 self.response_browser.setText(key_str)
                 # Clear the input fields
                 self.input1.clear()

@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle(f"DRM & Media Tool {__version__} ({CHANNEL})")
-        self.setGeometry(100, 100, 650, 350)
+        self.setGeometry(100, 100, 750, 450)
 
         # Create the tab widget
         tab_widget = QTabWidget(self)
