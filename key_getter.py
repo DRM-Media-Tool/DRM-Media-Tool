@@ -152,13 +152,13 @@ class KeyGeter(QWidget):
                 "headers": header,
                 "force": True
             }
-            print(payload)
 
             # Make the API request
             response = requests.post(api_url, headers=headers, json=payload)
             self.info_logger.info(response)
             data = json.loads(response.text)
             key = None
+            value = None
             # print(data)
             self.info_logger.info("API response is: %s", response)
             if response.status_code in [200, 302]:
@@ -186,6 +186,9 @@ class KeyGeter(QWidget):
                         else:
                             self.info_logger.info("Multiple keys found")
                             key_strings = keys
+                            value = []
+                            for k in key_strings:
+                                value.append(k)
                             cursor.execute(
                                 "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
 
@@ -226,13 +229,17 @@ class KeyGeter(QWidget):
             conn.commit()
             # Close the database connection
             conn.close()
-            if key is not None:
-                key_str = json.dumps(key)
-                self.response_browser.setText(key_str)
+            if value is not None:
+                value_str = "\n".join(f"--key {k}" for k in value)
+                self.response_browser.setText(value_str)
                 # Clear the input fields
                 self.input1.clear()
                 self.input2.clear()
                 self.input3.clear()
+            elif key is not None:
+                key_str = str(key)
+                formatted_str = f"--key {key_str}"
+                self.response_browser.setText(formatted_str)
             else:
                 error_message = "No keys to display."  # Customize this message as needed
                 # show_error_message(self, error_message)
