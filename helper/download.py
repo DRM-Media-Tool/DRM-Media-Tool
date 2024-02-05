@@ -2,7 +2,7 @@ import os
 import zipfile
 import urllib.request
 from pathlib import Path
-
+import shutil
 
 # mp4decrypt dictionary
 mp4decrypt = {
@@ -64,3 +64,6 @@ def download_and_extract_binary(binary_info):
         else:
             print(
                 f"Error: Executable file not found in the zip file for {binary_info['ZipName']}.")
+
+    # Remove the downloads folder after extraction
+    shutil.rmtree(Path(os.getcwd()) / 'downloads')
