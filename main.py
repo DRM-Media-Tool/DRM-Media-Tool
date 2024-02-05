@@ -7,6 +7,7 @@ from logger import setup_logging
 import platform
 import webbrowser
 import os
+from helper.download import download_and_extract_binary, mp4decrypt, ffmpeg
 from version import __version__, CHANNEL
 
 info_logger, debug_logger = setup_logging()
@@ -122,6 +123,12 @@ class MainWindow(QMainWindow):
 
 
 def main():
+    # Check and download mp4decrypt binary
+    download_and_extract_binary(mp4decrypt)
+
+    # Check and download ffmpeg binary
+    download_and_extract_binary(ffmpeg)
+
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
