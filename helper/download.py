@@ -3,7 +3,10 @@ import zipfile
 import urllib.request
 from pathlib import Path
 import shutil
+from logger import setup_logging
 
+
+info_logger, debug_logger = setup_logging()
 # Define dictionaries for each binary
 binaries = [
     {
@@ -30,7 +33,7 @@ def download_and_extract_binary(binary_info):
 
     # Check if the binary already exists
     if binary_location.is_file():
-        print(f"{binary_info['name']} is already present.")
+        info_logger.info(f"{binary_info['name']} is already present.")
         return
 
     # Create the binaries directory if it doesn't exist
@@ -61,11 +64,9 @@ def download_and_extract_binary(binary_info):
             extracted_binary_path = Path(
                 binary_info['unzip_folder_location']) / executable_file
             os.rename(extracted_binary_path, binary_info['binary_location'])
-            print(
-                f"{binary_info['name']} downloaded and extracted successfully.")
+            info_logger.info(f"{binary_info['name']} downloaded and extracted successfully.")
         else:
-            print(
-                f"Error: Executable file ({binary_info['expected_executable']}) not found in the zip file for {binary_info['name']}.")
+            debug_logger.debug(f"Error: Executable file ({binary_info['expected_executable']}) not found in the zip file for {binary_info['name']}.")
 
     # Clean up: Remove the downloads folder after extraction
     shutil.rmtree(Path(os.getcwd()) / 'downloads')
