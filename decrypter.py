@@ -5,6 +5,9 @@ import subprocess
 from popup.file_merger_dialog import FileMergerDialog
 from helper.message import show_error_message, show_success_message
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+mp4decrypt = os.path.join(current_dir, 'binaries', 'mp4decrypt')
+
 
 class Decrypter(QWidget):
     def __init__(self, debug_logger, info_logger):
@@ -212,7 +215,7 @@ class Decrypter(QWidget):
             output_file_path = os.path.normpath(
                 os.path.join(folder_name, decrypted_file))
 
-            decrypt_command = ['mp4decrypt']
+            decrypt_command = [mp4decrypt]
             if not keys:
                 # Customize this message as needed
                 error_message = "No key found in DB."
@@ -222,7 +225,7 @@ class Decrypter(QWidget):
                     decrypt_command.extend(["--key", key[0]])
             decrypt_command.extend([input_file_path, output_file_path])
             try:
-                # print(decrypt_command)
+                print(decrypt_command)
                 subprocess.run(decrypt_command, shell=True, check=True)
                 self.search_result_list.addItem(
                     f"   Decrypted File: {decrypted_file}")
