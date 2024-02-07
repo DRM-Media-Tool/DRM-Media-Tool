@@ -4,6 +4,9 @@ import json
 import subprocess
 from helper.message import show_error_message, show_success_message
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+ffmpeg_path = os.path.join(current_dir, 'binaries', 'ffmpeg ')
+
 
 class FileMergerDialog(QDialog):
     def __init__(self, debug_logger, info_logger, folder_path, parent=None):
@@ -142,7 +145,7 @@ class FileMergerDialog(QDialog):
                 self.debug_logger.debug("No matching files found.")
 
             # Build the ffmpeg command
-            ffmpeg_command = ('ffmpeg ')
+            ffmpeg_command = (ffmpeg_path)
 
             # Lists to store input options for video, audio, and subtitle
             video_inputs = []
