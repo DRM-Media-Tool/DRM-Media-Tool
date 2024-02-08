@@ -123,11 +123,11 @@ class MainWindow(QMainWindow):
 
 
 def main():
+    app = QApplication(sys.argv)
     # Check and download binaries
     for binary_info in binaries:
         download_and_extract_binary(binary_info)
 
-    app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
