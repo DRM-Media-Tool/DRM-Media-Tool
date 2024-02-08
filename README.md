@@ -24,7 +24,7 @@ pip install -r requirements.txt
 # Build EXE
 
 - Create a .env File under assets dir with the below values
-> Any API Forked From Getwvkeys can be used (cdrm-project, keysdb, getwvkeys & others).
+  > Any API Forked From Getwvkeys can be used (cdrm-project, keysdb, getwvkeys & others).
 
 ```
 API_URL = < API URL >
@@ -43,44 +43,6 @@ python update_version.py -c < Channel Name>
 
 ```
 pyinstaller --onefile --add-data "assets;assets" --name="DRM & Media Tool" --windowed --icon=assets\\logo.ico main.py --noconsole
-```
-
-# Instructions to Remove Firebase Code
-
-To remove the Firebase-related code from DRM & Media Tool application, follow these steps:
-
-- Remove the import statements for Firebase:
-
-```
-# Remove these lines
-
-from firebase_admin import credentials, firestore, initialize_app
-from datetime import datetime
-
-```
-
-- Remove the following lines where Firebase is initialized and the event data is added to the Firestore database:
-
-```
-key_path = os.path.join(current_dir, 'assets', 'serviceAccountKey.json')
-cred = credentials.Certificate(key_path)
-firebase_app = initialize_app(cred)
-db = firestore.client()
-
-current_datetime = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
-event_data = {
-    'pssh': pssh,
-    'license_url': license_url,
-    'movie_name': name,
-    'keys': keys if "keys" in data else [],
-    'datetime': current_datetime,
-}
-
-events_ref = db.collection('events')
-events_ref.add(event_data)
-
-self.info_logger.info("Key Added to Global Db")
-
 ```
 
 # Future Plans
