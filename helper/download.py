@@ -4,6 +4,8 @@ import urllib.request
 from pathlib import Path
 import shutil
 from logger import setup_logging
+from .progress import DownloadProgressDialog
+from PyQt5.QtWidgets import QApplication
 
 
 info_logger, debug_logger = setup_logging()
@@ -11,10 +13,10 @@ info_logger, debug_logger = setup_logging()
 binaries = [
     {
         'name': 'mp4decrypt',
-        'download_link': 'https://www.bok.net/Bento4/binaries/Bento4-SDK-1-6-0-639.x86_64-microsoft-win32.zip',
+        'download_link': 'https://www.bok.net/Bento4/binaries/Bento4-SDK-1-6-0-641.x86_64-microsoft-win32.zip',
         'binary_location': f'{os.getcwd()}/binaries/mp4decrypt.exe',
         'zip_location': f'{os.getcwd()}/downloads/temp/mp4decrypt.zip',
-        'unzip_folder_location': f"{os.getcwd()}/downloads/temp/Bento4-SDK-1-6-0-639.x86_64-microsoft-win32/",
+        'unzip_folder_location': f"{os.getcwd()}/downloads/temp/Bento4-SDK-1-6-0-641.x86_64-microsoft-win32/",
         'expected_executable': 'mp4decrypt.exe'
     },
     {
@@ -29,6 +31,12 @@ binaries = [
 
 
 def download_and_extract_binary(binary_info):
+    # Create the progress dialog
+    binary_name = binary_info['name']
+    dialog = DownloadProgressDialog(binary_name)
+    dialog.show()
+    app = QApplication.instance()
+
     binary_location = Path(binary_info['binary_location'])
 
     # Check if the binary already exists
@@ -44,9 +52,14 @@ def download_and_extract_binary(binary_info):
     temp_dir = Path(binary_info['unzip_folder_location'])
     temp_dir.mkdir(parents=True, exist_ok=True)
 
-    # Download the binary zip file
+    # Download the binary zip file with progress display
+    def progress_callback(count, block_size, total_size):
+        percent = int(count * block_size * 100 / total_size)
+        dialog.set_progress(percent)
+        app.processEvents()  # Allow GUI updates
+
     urllib.request.urlretrieve(
-        binary_info['download_link'], binary_info['zip_location'])
+        binary_info['download_link'], binary_info['zip_location'], reporthook=progress_callback)
 
     # Extract the binary from the zip file
     with zipfile.ZipFile(binary_info['zip_location'], 'r') as zip_ref:
@@ -64,14 +77,15 @@ def download_and_extract_binary(binary_info):
             extracted_binary_path = Path(
                 binary_info['unzip_folder_location']) / executable_file
             os.rename(extracted_binary_path, binary_info['binary_location'])
-            info_logger.info(f"{binary_info['name']} downloaded and extracted successfully.")
+            info_logger.info(
+                f"{binary_info['name']} downloaded and extracted successfully.")
         else:
-            debug_logger.debug(f"Error: Executable file ({binary_info['expected_executable']}) not found in the zip file for {binary_info['name']}.")
+            debug_logger.debug(
+                f"Error: Executable file ({binary_info['expected_executable']}) not found in the zip file for {binary_info['name']}.")
 
     # Clean up: Remove the downloads folder after extraction
     shutil.rmtree(Path(os.getcwd()) / 'downloads')
 
-
-# Iterate over each binary and download/extract it
-for binary_info in binaries:
-    download_and_extract_binary(binary_info)
+    # Iterate over each binary and download/extract it
+    for binary_info in binaries:
+        download_and_extract_binary(binary_info)
