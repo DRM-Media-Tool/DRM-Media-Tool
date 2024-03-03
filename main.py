@@ -1,5 +1,12 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QMessageBox, QAction, QMenu
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QTabWidget,
+    QMessageBox,
+    QAction,
+    QMenu
+)
 from PyQt5.QtGui import QIcon
 from key_getter import KeyGeter
 from decrypter import Decrypter
@@ -105,11 +112,18 @@ class MainWindow(QMainWindow):
 
         app_info = "<font size=6>DRM & Media Tool</font><br>"
         os_details = f"""
-            <font size=4><b>Operating System: {platform.system()} {platform.release()}</b></font> <br>
+            <font size=4>
+            <b>Operating System: {platform.system()} {platform.release()}</b>
+            </font> <br>
             <font size=4><b>Developed By: Rajeshwaran</b></font> <br>
             <font size=4><b>Version: {__version__} ({CHANNEL})</b></font> <br>
             <br>
-            <a href="https://github.com/Rajeshwaran2001" target="_blank"><img src="{git}" height=25 alt="GitHub"> </a> &nbsp; <a href="https://discord.gg/QpEHdyst5b" target="_blank"><img src="{discord}" height=25 alt="Discord"> </a> &nbsp; <a href="https://forms.gle/xtVPKLcAKNUwY2WD6" target="_blank"><img src="{bug}" height=25 alt="BUG"> </a> <br>
+            <a href="https://github.com/Rajeshwaran2001" target="_blank">
+            <img src="{git}" height=25 alt="GitHub"> </a> &nbsp; <a href=
+            "https://discord.gg/QpEHdyst5b" target="_blank">
+            <img src="{discord}" height=25 alt="Discord"> </a> &nbsp; <a href=
+            "https://forms.gle/xtVPKLcAKNUwY2WD6" target="_blank">
+            <img src="{bug}" height=25 alt="BUG"> </a> <br>
             """
 
         about_dialog.setText(app_info)
