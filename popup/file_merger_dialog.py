@@ -5,7 +5,8 @@ import subprocess
 from helper.message import show_error_message, show_success_message
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-ffmpeg_path = os.path.join(current_dir, 'binaries', 'ffmpeg ')
+parent_dir = os.path.dirname(current_dir)
+ffmpeg_path = os.path.join(parent_dir, 'binaries', 'ffmpeg ')
 
 
 class FileMergerDialog(QDialog):
@@ -145,7 +146,7 @@ class FileMergerDialog(QDialog):
                 self.debug_logger.debug("No matching files found.")
 
             # Build the ffmpeg command
-            ffmpeg_command = (ffmpeg_path)
+            ffmpeg_command = (f'{ffmpeg_path}')
 
             # Lists to store input options for video, audio, and subtitle
             video_inputs = []
@@ -264,7 +265,7 @@ class FileMergerDialog(QDialog):
 
             # Run the ffmpeg command
             try:
-                # print(ffmpeg_command)
+                print(ffmpeg_command)
                 subprocess.run(ffmpeg_command, shell=True, check=True)
                 # Assuming you have access to the close method of your window
                 self.close()
