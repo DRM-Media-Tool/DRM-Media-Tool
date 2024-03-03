@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QPushButton,
     QTextBrowser,
-    QPlainTextEdit
+    QPlainTextEdit,
+    QComboBox
 )
 import sqlite3
 import requests
@@ -41,11 +42,14 @@ class KeyGeter(QWidget):
         label4.setToolTip('Leave headers empty if not required')
         label5 = QLabel('Proxy:')
         label5.setToolTip('Leave Proxy empty if not required')
+        label6 = QLabel('Build Info:')
         self.input1 = QLineEdit()
         self.input2 = QLineEdit()
         self.input3 = QLineEdit()
         self.input4 = QPlainTextEdit()
         self.input5 = QLineEdit()
+        self.input6 = QComboBox()
+        self.populate_combo_box()
 
         # To have input and lable on same line
         row_layout1 = QHBoxLayout()
@@ -73,6 +77,11 @@ class KeyGeter(QWidget):
         row_layout5.addWidget(self.input5)
         layout.addLayout(row_layout5)
 
+        layout_label6 = QVBoxLayout()
+        layout_label6.addWidget(label6)
+        layout_label6.addWidget(self.input6)
+        layout.addLayout(layout_label6)
+
         # Create a button
         buttons_layout = QHBoxLayout()
 
@@ -95,6 +104,23 @@ class KeyGeter(QWidget):
         layout.addWidget(self.response_browser)
 
         self.show()
+
+    def populate_combo_box(self):
+        # Add an empty item as default
+        self.input6.addItem("")
+
+        # Connect to the database
+        conn = sqlite3.connect('db.db')
+        cursor = conn.cursor()
+
+        # Fetch data for the combo box from the database
+        # Assuming 'cdm' is your table name
+        cursor.execute("SELECT device_info FROM cdm")
+        data = cursor.fetchall()
+        for row in data:
+            self.input6.addItem(row[0])
+
+        conn.close()
 
     def handle_upload_cdm_click(self):
         upload_cdm_dialog = UploadCDMDialog(
@@ -248,6 +274,8 @@ class KeyGeter(QWidget):
                 self.input1.clear()
                 self.input2.clear()
                 self.input3.clear()
+                self.input4.clear()
+                self.input5.clear()
             elif key is not None:
                 key_str = str(key)
                 formatted_str = f"--key {key_str}"
