@@ -7,8 +7,8 @@ from logger import setup_logging
 from .progress import DownloadProgressDialog
 from PyQt5.QtWidgets import QApplication
 
-
 info_logger, debug_logger = setup_logging()
+
 # Define dictionaries for each binary
 binaries = [
     {
@@ -31,11 +31,20 @@ binaries = [
 
 
 def download_and_extract_binary(binary_info):
+    # Check if QApplication is already instantiated
+    if QApplication.instance() is None:
+        app = QApplication([])
+    else:
+        app = QApplication.instance()
+
     # Create the progress dialog
     binary_name = binary_info['name']
     dialog = DownloadProgressDialog(binary_name)
+
+    # Set window title with message
+    dialog.setWindowTitle(f"Downloading {binary_name}")
+
     dialog.show()
-    app = QApplication.instance()
 
     binary_location = Path(binary_info['binary_location'])
 
@@ -69,8 +78,7 @@ def download_and_extract_binary(binary_info):
 
         # Look for the expected executable within the zip file contents
         executable_file = next(
-            (f for f in zip_file_contents if f.endswith(binary_info[
-                'expected_executable'])), None)
+            (f for f in zip_file_contents if f.endswith(binary_info['expected_executable'])), None)
 
         # If found, extract and move the executable file to the binaries folder
         if executable_file:
@@ -80,7 +88,7 @@ def download_and_extract_binary(binary_info):
                 binary_info['unzip_folder_location']) / executable_file
             os.rename(extracted_binary_path, binary_info['binary_location'])
             info_logger.info(
-                f"{binary_info['name']} downloaded and extra successfully.")
+                f"{binary_info['name']} downloaded and extracted successfully.")
         else:
             debug_logger.debug(
                 f"Error: Executable file ({binary_info['expected_executable']}) not found in the zip file for {binary_info['name']}.")
@@ -88,6 +96,7 @@ def download_and_extract_binary(binary_info):
     # Clean up: Remove the downloads folder after extraction
     shutil.rmtree(Path(os.getcwd()) / 'downloads')
 
-    # Iterate over each binary and download/extract it
-    for binary_info in binaries:
-        download_and_extract_binary(binary_info)
+
+# Iterate over each binary and download/extract it
+for binary_info in binaries:
+    download_and_extract_binary(binary_info)
