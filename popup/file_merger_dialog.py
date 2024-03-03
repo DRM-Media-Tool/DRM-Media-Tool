@@ -201,21 +201,21 @@ class FileMergerDialog(QDialog):
             # print(subtitle_file)
 
             # Prepare the output file name
-            episode_name = metadata.get(
-                "episode", os.path.basename(self.folder_path))
+            title_name = metadata.get(
+                "title", os.path.basename(self.folder_path))
             release_year = metadata.get("release_year", "")
             year_suffix = f' ({release_year})' if release_year else ''
-            output_file = f'{episode_name.replace(":", " ").replace("?", "")} {year_suffix}.mp4'
+            output_file = f'{title_name.replace(":", " ").replace("?", "")} {year_suffix}.mp4'
             # Handle the case where the file already exists
             co = 1
             while os.path.exists(os.path.join(self.folder_path, output_file)):
                 # Replace spaces with underscores and colons with empty spaces
-                episode_name = metadata.get(
+                title_name = metadata.get(
                     "episode", os.path.basename(self.folder_path))
                 release_year = metadata.get("release_year", "")
                 year_suffix = f' ({release_year})' if release_year else ''
 
-                output_file = f'{episode_name.replace(":", " ").replace("?", "")} {year_suffix} ({co}).mp4'
+                output_file = f'{title_name.replace(":", " ").replace("?", "")} {year_suffix} ({co}).mp4'
                 co += 1
 
             # Convert the genres to a string with semicolons as separators
