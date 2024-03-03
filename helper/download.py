@@ -53,13 +53,14 @@ def download_and_extract_binary(binary_info):
     temp_dir.mkdir(parents=True, exist_ok=True)
 
     # Download the binary zip file with progress display
-    def progress_callback(count, block_size, total_size):
+    def progress(count, block_size, total_size):
         percent = int(count * block_size * 100 / total_size)
         dialog.set_progress(percent)
         app.processEvents()  # Allow GUI updates
 
     urllib.request.urlretrieve(
-        binary_info['download_link'], binary_info['zip_location'], reporthook=progress_callback)
+        binary_info['download_link'], binary_info['zip_location'],
+        reporthook=progress)
 
     # Extract the binary from the zip file
     with zipfile.ZipFile(binary_info['zip_location'], 'r') as zip_ref:
@@ -68,7 +69,8 @@ def download_and_extract_binary(binary_info):
 
         # Look for the expected executable within the zip file contents
         executable_file = next(
-            (f for f in zip_file_contents if f.endswith(binary_info['expected_executable'])), None)
+            (f for f in zip_file_contents if f.endswith(binary_info[
+                'expected_executable'])), None)
 
         # If found, extract and move the executable file to the binaries folder
         if executable_file:
@@ -78,7 +80,7 @@ def download_and_extract_binary(binary_info):
                 binary_info['unzip_folder_location']) / executable_file
             os.rename(extracted_binary_path, binary_info['binary_location'])
             info_logger.info(
-                f"{binary_info['name']} downloaded and extracted successfully.")
+                f"{binary_info['name']} downloaded and extra successfully.")
         else:
             debug_logger.debug(
                 f"Error: Executable file ({binary_info['expected_executable']}) not found in the zip file for {binary_info['name']}.")

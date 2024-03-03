@@ -1,6 +1,15 @@
 import os
 import requests
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QHBoxLayout, QApplication
+from PyQt5.QtWidgets import (
+    QDialog,
+    QVBoxLayout,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QFileDialog,
+    QHBoxLayout
+)
 from bs4 import BeautifulSoup
 from helper.message import show_error_message, show_success_message
 import sqlite3
@@ -75,7 +84,7 @@ class UploadCDMDialog(QDialog):
             # Prepare files for upload
             files = {
                 'blob': ('device_id_file.txt', open(device_id_file_path, 'rb')),
-                'key': ('private_key_file.txt', open(private_key_file_path, 'rb'))
+                'key': ('private_key.txt', open(private_key_file_path, 'rb'))
             }
             print(files)
 
@@ -97,7 +106,7 @@ class UploadCDMDialog(QDialog):
 
                     # Extract the text within the <h1> tag
                     if len(h1_section_titles) >= 2:
-                        extracted_value = h1_section_titles[1].text.strip()
+                        id = h1_section_titles[1].text.strip()
                         conn = sqlite3.connect('db.db')
                         cursor = conn.cursor()
 
@@ -109,12 +118,12 @@ class UploadCDMDialog(QDialog):
                             )
                         ''')
                         cursor.execute(
-                            'INSERT INTO cdm (device_info) VALUES (?)', (extracted_value,))
+                            'INSERT INTO cdm (device_info) VALUES (?)', (id,))
                         conn.commit()
 
                         conn.close()
 
-                        success_message = f"New CDM Uploaded: {extracted_value}."
+                        success_message = f"New CDM Uploaded: {id}."
                         show_success_message(self, success_message)
                         self.info_logger.info(success_message)
                     else:
@@ -126,4 +135,4 @@ class UploadCDMDialog(QDialog):
             except requests.RequestException as e:
                 print(f'Error sending request: {e}')
         else:
-            print('Please select both Device ID and Private Key files before submitting')
+            print('Please select both files before submitting')

@@ -1,4 +1,14 @@
-from PyQt5.QtWidgets import QWidget, QDialog, QVBoxLayout, QLabel, QTableWidget, QPushButton, QHBoxLayout, QTableWidgetItem, QCheckBox
+from PyQt5.QtWidgets import (
+    QWidget,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
+    QTableWidget,
+    QPushButton,
+    QHBoxLayout,
+    QTableWidgetItem,
+    QCheckBox
+)
 import os
 import json
 import subprocess
@@ -48,9 +58,12 @@ class FileMergerDialog(QDialog):
         try:
             # List only video and audio files in the specified directory
             video_files = [file for file in os.listdir(
-                self.folder_path) if file.lower().endswith(('.mp4', '.mkv', '.avi', '.webm'))]
+                self.folder_path) if file.lower().endswith(('.mp4', '.mkv',
+                                                            '.avi', '.webm'))]
             audio_files = [file for file in os.listdir(
-                self.folder_path) if file.lower().endswith(('.mp3', '.wav', '.ogg', '.m4a', '.webm'))]
+                self.folder_path) if file.lower().endswith(('.mp3', '.wav',
+                                                            '.ogg', '.m4a',
+                                                            '.webm'))]
 
             # Add video files to the table widget
             for idx, file in enumerate(video_files):
@@ -108,7 +121,8 @@ class FileMergerDialog(QDialog):
             info_files = [file for file in os.listdir(
                 self.folder_path) if file.endswith('.info.json')]
             img_files = [file for file in os.listdir(
-                self.folder_path) if file.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))]
+                self.folder_path) if file.lower().endswith(('.jpg', '.jpeg',
+                                                            '.png', '.webp'))]
             language_mapping = {
                 'en': 'eng',
                 'eng': 'eng',
@@ -160,25 +174,25 @@ class FileMergerDialog(QDialog):
                 if file_info[1] == 'Video':
                     video_inputs.append(f'-i "{input_file_path}" ')
                     # Extract the extension from the video file
-                    extension = os.path.splitext(input_file_path)[1]
+                    # extension = os.path.splitext(input_file_path)[1]
                 elif file_info[1] == 'Audio':
                     audio_inputs.append(f'-i "{input_file_path}" ')
 
-            # Add subtitle inputs from the provided list //join([f'-map {i + 1}:a' for i in range(len(audio_inputs))]) +
-            for i, subtitle_file in enumerate(subtitle_files):
+            # Add subtitle inputs from the provided list
+            for i, sub in enumerate(subtitle_files):
                 for code in language_codes:
-                    if f'.{code}.' in subtitle_file:
-                        language_code = language_mapping.get(code, 'Unknown')
-                        if language_code.lower() == 'eng':
+                    if f'.{code}.' in sub:
+                        lang = language_mapping.get(code, 'Unknown')
+                        if lang.lower() == 'eng':
                             title = 'English'
-                        elif language_code.lower() == 'tam':
+                        elif lang.lower() == 'tam':
                             title = 'Tamil'
                         else:
                             title = 'Unknown'
-                        metadata_strings = f'-metadata:s:s:{i} language="{language_code}" -metadata:s:s:{i} title="{title}" '
-                        metadata_strings_array.append(metadata_strings)
+                        metadata_data = f'-metadata:s:s:{i} language="{lang}" -metadata:s:s:{i} title="{title}" '
+                        metadata_strings_array.append(metadata_data)
                         subtitle_inputs.append(
-                            f'-i "{os.path.join(self.folder_path, subtitle_file)}" ')
+                            f'-i "{os.path.join(self.folder_path, sub)}" ')
                         break
 
             # Combine the video, audio, and subtitle input options
@@ -190,8 +204,8 @@ class FileMergerDialog(QDialog):
             episode_name = metadata.get(
                 "episode", os.path.basename(self.folder_path))
             release_year = metadata.get("release_year", "")
-            release_year_suffix = f' ({release_year})' if release_year else ''
-            output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix}.mp4'
+            year_suffix = f' ({release_year})' if release_year else ''
+            output_file = f'{episode_name.replace(":", " ").replace("?", "")} {year_suffix}.mp4'
             # Handle the case where the file already exists
             co = 1
             while os.path.exists(os.path.join(self.folder_path, output_file)):
@@ -199,9 +213,9 @@ class FileMergerDialog(QDialog):
                 episode_name = metadata.get(
                     "episode", os.path.basename(self.folder_path))
                 release_year = metadata.get("release_year", "")
-                release_year_suffix = f' ({release_year})' if release_year else ''
+                year_suffix = f' ({release_year})' if release_year else ''
 
-                output_file = f'{episode_name.replace(":", " ").replace("?", "")} {release_year_suffix} ({co}).mp4'
+                output_file = f'{episode_name.replace(":", " ").replace("?", "")} {year_suffix} ({co}).mp4'
                 co += 1
 
             # Convert the genres to a string with semicolons as separators

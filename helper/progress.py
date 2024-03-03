@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QProgressBar, QLabel
 class DownloadProgressDialog(QDialog):
     def __init__(self, binary_name):
         super().__init__()
-        self.setWindowTitle("Downloading Missing Binaries")
+        self.setWindowTitle("Downloading Binaries")
         self.resize(300, 70)
         self.layout = QVBoxLayout()
         self.progress_label = QLabel(f"Downloading {binary_name}")

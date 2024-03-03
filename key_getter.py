@@ -1,4 +1,13 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QHBoxLayout, QPushButton, QTextBrowser, QPlainTextEdit
+from PyQt5.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QLineEdit,
+    QHBoxLayout,
+    QPushButton,
+    QTextBrowser,
+    QPlainTextEdit
+)
 import sqlite3
 import requests
 import json
