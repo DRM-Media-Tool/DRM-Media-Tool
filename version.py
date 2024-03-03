@@ -1,4 +1,4 @@
 
-__version__ = '2024.02.11.8777'
+__version__ = '2024.03.03.39'
 
-CHANNEL = 'Beta'
+CHANNEL = 'Stable'
