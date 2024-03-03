@@ -112,6 +112,12 @@ class KeyGeter(QWidget):
         # Connect to the database
         conn = sqlite3.connect('db.db')
         cursor = conn.cursor()
+        cursor.execute('''
+                            CREATE TABLE IF NOT EXISTS cdm (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                device_info TEXT
+                            )
+                        ''')
 
         # Fetch data for the combo box from the database
         # Assuming 'cdm' is your table name
