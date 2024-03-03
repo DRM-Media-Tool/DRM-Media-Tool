@@ -8,7 +8,9 @@ def get_channel_from_input():
     parser = argparse.ArgumentParser(
         description='Generate and update version information.')
     parser.add_argument('-c', '--channel', choices=[
-                        'Beta', 'Stable'], help='Select a channel (Beta or Stable)', required=True)
+                        'Beta', 'Stable', 'Dev'],
+                        help='Select a channel (Stable, Beta or Dev)',
+                        required=True)
     args = parser.parse_args()
     return args.channel
 
@@ -44,6 +46,8 @@ if not existing_version:
 else:
     # Append random 4-digit increment
     if channel == "Beta":
+        new_version = f"{base_version}.{random.randint(100, 9999)}"
+    elif channel == "Dev":
         new_version = f"{base_version}.{random.randint(1000, 9999)}"
     else:
         new_version = f"{base_version}.{random.randint(10, 99)}"
