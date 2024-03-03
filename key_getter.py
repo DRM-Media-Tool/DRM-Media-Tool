@@ -135,6 +135,7 @@ class KeyGeter(QWidget):
         name = self.input3.text()
         header = self.input4.toPlainText()
         proxy = self.input5.text()
+        Build_info = self.input6.currentText()
         # Check if any field is empty
         if not name:
             self.info_logger.info("Name Field is Empty")
@@ -150,6 +151,9 @@ class KeyGeter(QWidget):
 
         if not header:
             self.info_logger.info("headers Field is Empty")
+
+        if not Build_info:
+            self.info_logger.info("Build_info is Empty")
 
         conn = sqlite3.connect('db.db')
         self.info_logger.info("DB Connected Succesfully")
@@ -188,7 +192,8 @@ class KeyGeter(QWidget):
                 "pssh": pssh,
                 "proxy": proxy,
                 "headers": header,
-                "force": True
+                "force": True,
+                "buildInfo": Build_info
             }
 
             # Make the API request
@@ -259,7 +264,7 @@ class KeyGeter(QWidget):
                 except Exception as e:
                     self.debug_logger.debug(e)
             else:
-                error_message = "API ERROR."
+                error_message = "API Error or CDM not found."
                 show_error_message(self, error_message)
                 self.info_logger.info(error_message)
 
