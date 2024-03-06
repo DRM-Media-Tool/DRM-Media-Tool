@@ -12,9 +12,10 @@ from PyQt5.QtWidgets import (
 import os
 import json
 import subprocess
+import sys
 from helper.message import show_error_message, show_success_message
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.dirname(sys.executable)
 parent_dir = os.path.dirname(current_dir)
 ffmpeg_path = os.path.join(parent_dir, 'binaries', 'ffmpeg ')
 
@@ -254,7 +255,7 @@ class FileMergerDialog(QDialog):
                     '-metadata handler_name="Amazon Prime Video" '
                     '-metadata encoder="FFmpeg" '
                 ).format(
-                    metadata.get("episode", ""),
+                    metadata.get("title", ""),
                     metadata.get("description", "").replace("\"", ""),
                     metadata.get("extractor_key", ""),
                     metadata.get("extractor_key", ""),

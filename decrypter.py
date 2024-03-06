@@ -9,12 +9,13 @@ from PyQt5.QtWidgets import (
     QListWidget
     )
 import os
+import sys
 import sqlite3
 import subprocess
 from popup.file_merger_dialog import FileMergerDialog
 from helper.message import show_error_message, show_success_message
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
+current_dir = os.path.dirname(sys.executable)
 mp4decrypt = os.path.join(current_dir, 'binaries', 'mp4decrypt')
 
 
