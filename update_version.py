@@ -1,5 +1,4 @@
 import os
-import random
 from datetime import datetime
 import argparse
 
@@ -28,29 +27,27 @@ day = now.day
 # Build the base version string
 base_version = f"{year}.{month:02d}.{day:02d}"
 
-# Read the existing version from the file if it exists
+# Read the existing versions from the file if it exists
 file_path = "version.py"
-existing_version = None
+existing_versions = []
 if os.path.exists(file_path):
     with open(file_path, "r") as f:
         for line in f:
             if line.startswith("__version__"):
-                existing_version = line.split("=")[1].strip().strip("'")
+                existing_versions.append(
+                    int(line.split("=")[1].strip().strip("'").split(".")[-1]))
                 # print(existing_version)
                 break
 
 # Generate new version
-if not existing_version:
+if not existing_versions:
     # First time, use base version
-    new_version = base_version
+    new_version = f"{base_version}.01"
 else:
-    # Append random 4-digit increment
-    if channel == "Beta":
-        new_version = f"{base_version}.{random.randint(100, 9999)}"
-    elif channel == "Dev":
-        new_version = f"{base_version}.{random.randint(1000, 9999)}"
-    else:
-        new_version = f"{base_version}.{random.randint(10, 99)}"
+    # Increment the last two digits by finding the maximum and adding 1
+    max_value = max(existing_versions)
+    new_last_two_digits = str(max_value + 1).zfill(2)
+    new_version = f"{base_version}.{new_last_two_digits}"
 
 # Update version.py file
 with open(file_path, "w") as f:
