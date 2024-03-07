@@ -16,8 +16,7 @@ import sys
 from helper.message import show_error_message, show_success_message
 
 current_dir = os.path.dirname(sys.executable)
-parent_dir = os.path.dirname(current_dir)
-ffmpeg_path = os.path.join(parent_dir, 'binaries', 'ffmpeg ')
+ffmpeg_path = os.path.join(current_dir, 'binaries', 'ffmpeg ')
 
 
 class FileMergerDialog(QDialog):
