@@ -219,9 +219,10 @@ class FileMergerDialog(QDialog):
                 co += 1
 
             # Convert the genres to a string with semicolons as separators
-            if "genre" in metadata:
+            if "genres" in metadata:
+                genre_string = ';'.join(metadata["genres"])
+            elif "genre" in metadata:
                 genre_string = ';'.join(metadata["genre"])
-                # Rest of your code using genre_string
             else:
                 genre_string = ""
 
@@ -254,7 +255,7 @@ class FileMergerDialog(QDialog):
                     '-metadata handler_name="Amazon Prime Video" '
                     '-metadata encoder="FFmpeg" '
                 ).format(
-                    metadata.get("title", ""),
+                    metadata.get("title", metadata.get("episode", "")),
                     metadata.get("description", "").replace("\"", ""),
                     metadata.get("extractor_key", ""),
                     metadata.get("extractor_key", ""),
