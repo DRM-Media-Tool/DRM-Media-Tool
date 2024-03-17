@@ -233,6 +233,14 @@ class FileMergerDialog(QDialog):
             else:
                 actor_string = ""
 
+            if "release_year" in metadata:
+                release_year = metadata.get("release_year", "")
+            elif "upload_date" in metadata:
+                upload_date = metadata.get("upload_date")
+                release_year = upload_date[:4]
+            else:
+                release_year = ""
+
             if thumbnail_file is not None:
                 ffmpeg_command += f'-i "{thumbnail_file}" '
 
@@ -266,7 +274,7 @@ class FileMergerDialog(QDialog):
                     metadata.get("description", "").replace("\"", ""),
                     metadata.get("extractor_key", ""),
                     actor_string,
-                    metadata.get("release_year", ""),
+                    release_year,
                     genre_string,
                 )
 
