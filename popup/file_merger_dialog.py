@@ -12,11 +12,16 @@ from PyQt5.QtWidgets import (
 import os
 import json
 import subprocess
+import re
 import sys
 from helper.message import show_error_message, show_success_message
 
 current_dir = os.path.dirname(sys.executable)
 ffmpeg_path = os.path.join(current_dir, 'binaries', 'ffmpeg ')
+
+
+def sanitize_filename(filename):
+    return re.sub(r'[\/:*?"<>|]', '_', filename)
 
 
 class FileMergerDialog(QDialog):
@@ -164,8 +169,8 @@ class FileMergerDialog(QDialog):
 
             # Lists to store input options for video, audio, and subtitle
             video_inputs = []
-            audio_inputs = []
-            subtitle_inputs = []
+            audios = []
+            sub_input = []
             # Initialize an array to store metadata strings
             metadata_strings_array = []
 
@@ -176,7 +181,7 @@ class FileMergerDialog(QDialog):
                     # Extract the extension from the video file
                     # extension = os.path.splitext(input_file_path)[1]
                 elif file_info[1] == 'Audio':
-                    audio_inputs.append(f'-i "{input_file_path}" ')
+                    audios.append(f'-i "{input_file_path}" ')
 
             # Add subtitle inputs from the provided list
             for i, sub in enumerate(subtitle_files):
@@ -189,15 +194,17 @@ class FileMergerDialog(QDialog):
                             title = 'Tamil'
                         else:
                             title = 'Unknown'
-                        metadata_data = f'-metadata:s:s:{i} language="{lang}" -metadata:s:s:{i} title="{title}" '
+                        language = f'-metadata:s:s:{i} language="{lang}" '
+                        lang_title = f'-metadata:s:s:{i} title="{title}" '
+                        metadata_data = language + lang_title
                         metadata_strings_array.append(metadata_data)
-                        subtitle_inputs.append(
+                        sub_input.append(
                             f'-i "{os.path.join(self.folder_path, sub)}" ')
                         break
 
             # Combine the video, audio, and subtitle input options
             ffmpeg_command += ''.join(video_inputs) + \
-                ''.join(audio_inputs) + ''.join(subtitle_inputs)
+                ''.join(audios) + ''.join(sub_input)
             # print(subtitle_file)
 
             # Prepare the output file name
@@ -205,17 +212,26 @@ class FileMergerDialog(QDialog):
                 "title", os.path.basename(self.folder_path))
             release_year = metadata.get("release_year", "")
             year_suffix = f' ({release_year})' if release_year else ''
-            output_file = f'{title_name.replace(":", " ").replace("?", "")} {year_suffix}.mp4'
+            season_no = str(metadata.get("season_number", "")).zfill(2)
+            ep_no = str(metadata.get("episode_number", "")).zfill(2)
+            title = sanitize_filename(metadata.get("title", ""))
+            if "episode_number" and "season_number" in metadata:
+                output_file = f'S{season_no}E{ep_no}_{title}.mp4'
+            else:
+                output_file = (
+                    f'{title_name.replace(":", " ").replace("?", "")} '
+                    f'{year_suffix}.mp4'
+                )
             # Handle the case where the file already exists
             co = 1
             while os.path.exists(os.path.join(self.folder_path, output_file)):
-                # Replace spaces with underscores and colons with empty spaces
-                title_name = metadata.get(
-                    "episode", os.path.basename(self.folder_path))
-                release_year = metadata.get("release_year", "")
-                year_suffix = f' ({release_year})' if release_year else ''
-
-                output_file = f'{title_name.replace(":", " ").replace("?", "")} {year_suffix} ({co}).mp4'
+                if "episode_number" and "season_number" in metadata:
+                    output_file = f'S{season_no}E{ep_no}_{title} ({co}).mp4'
+                else:
+                    output_file = (
+                        f'{title_name.replace(":", " ").replace("?", "")} '
+                        f'{year_suffix} ({co}).mp4'
+                    )
                 co += 1
 
             # Convert the genres to a string with semicolons as separators
@@ -246,10 +262,10 @@ class FileMergerDialog(QDialog):
 
             # Add metadata and subtitle merging options to the ffmpeg command
             ffmpeg_command += (
-                f'-c:v copy '
-                f'-c:a copy '
-                f'-c:s mov_text '  # Use the determined subtitle codec
-                f'-c:v:1 png '
+                '-c:v copy '
+                '-c:a copy '
+                '-c:s mov_text '  # Use the determined subtitle codec
+                '-c:v:1 png '
             )
             ffmpeg_command += ''.join(metadata_strings_array)
 
@@ -267,27 +283,32 @@ class FileMergerDialog(QDialog):
                     '-metadata Artist="{}" '
                     '-metadata date="{}" '
                     '-metadata genre="{}" '
+                    '-metadata Album="{}" '
                     '-metadata handler_name="Amazon Prime Video" '
                     '-metadata encoder="FFmpeg" '
                 ).format(
-                    metadata.get("title", metadata.get("episode", "")),
+                    metadata.get("title", ""),
                     metadata.get("description", "").replace("\"", ""),
                     metadata.get("extractor_key", ""),
                     actor_string,
                     release_year,
                     genre_string,
+                    metadata.get("series")
                 )
 
             ffmpeg_command += (
                 # Map all video, audio, and subtitle streams
-                f'-map 0:v ' + ' '.join([f'-map {i + 1}:a' for i in range(len(audio_inputs))]) +
-                ' ' + ' '.join([f'-map {i + 1 + len(audio_inputs)}:s' for i in range(len(subtitle_inputs))]) +
-                ' ' + ' '.join([f'-map { 1 + (len(audio_inputs) + len(subtitle_inputs))}']
+                '-map 0:v ' + ' '.join
+                ([f'-map {i + 1}:a' for i in range(len(audios))]) +
+                ' ' + ' '.join
+                ([f'-map {i + 1 + len(audios)}:s'
+                  for i in range(len(sub_input))]) +
+                ' ' + ' '.join([f'-map { 1 + (len(audios) + len(sub_input))}']
                                ) if thumbnail_file is not None else ''
             )
 
             ffmpeg_command += (
-                ' -disposition:v:1 attached_pic '  # Set subtitle stream as default
+                ' -disposition:v:1 attached_pic '  # Set sub stream as default
                 f'-movflags +faststart '  # Enable faststart for streaming
                 f'-strict experimental '  # Necessary for using the AAC codec
                 f'"{os.path.join(self.folder_path, output_file)}"'
