@@ -146,7 +146,7 @@ class FileMergerDialog(QDialog):
             # print(subtitle_files)
 
             if not info_files:
-                show_error_message(self, "Error: No Metadata files found.")
+                # show_error_message(self, "Error: No Metadata files found.")
                 self.debug_logger.debug("Error: No Metadata files found.")
             else:
                 # Assume the first found .info.json file
@@ -156,7 +156,7 @@ class FileMergerDialog(QDialog):
                 with open(info_file_path, 'r', encoding='utf-8') as info_file:
                     metadata = json.load(info_file)
             if not subtitle_files:
-                show_error_message(self, "Error: No Subtitle files found.")
+                # show_error_message(self, "Error: No Subtitle files found.")
                 self.debug_logger.debug("Error: No Subtitle files found.")
             if img_files:
                 thumbnail_file = os.path.join(self.folder_path, img_files[0])
