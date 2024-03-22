@@ -306,6 +306,12 @@ class KeyGeter(QWidget):
                 key_str = str(key)
                 formatted_str = f"--key {key_str}"
                 self.response_browser.setText(formatted_str)
+                # Clear the input fields
+                self.input1.clear()
+                self.input2.clear()
+                self.input3.clear()
+                self.input4.clear()
+                self.input5.clear()
             else:
                 error_message = "No keys to display."
                 # show_error_message(self, error_message)
