@@ -183,7 +183,9 @@ class KeyGeter(QWidget):
         path = "/api"
         api_url = f"{base_url.rstrip('/')}{path}"
         headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (Ktesttemp, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
+            "user-agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                           "AppleWebKit/537.36 (Ktesttemp, like Gecko) "
+                           "Chrome/90.0.4430.85 Safari/537.36"),
             "Content-Type": "application/json",
             "X-API-Key": os.getenv("X_API_KEY"),
         }
@@ -218,18 +220,22 @@ class KeyGeter(QWidget):
                             for key_info in keys:
                                 if isinstance(key_info, str):
                                     key = key_info
-                                elif isinstance(key_info, dict) and "key" in key_info:
+                                elif isinstance(key_info, dict) \
+                                        and "key" in key_info:
                                     key = key_info["key"]
                                 else:
                                     self.debug_logger.debug("Error")
                                     continue
                             cursor.execute(
-                                "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+                                "INSERT INTO pssh "
+                                "(pssh, license_url, movie_name) "
+                                "VALUES (?, ?, ?)", (pssh, license_url, name))
 
                             conn.commit()
                             pssh_id = cursor.lastrowid
                             cursor.execute(
-                                "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
+                                "INSERT INTO keys (key, pssh_id) "
+                                "VALUES (?, ?)", (key, pssh_id))
                             # print("One key found")
                             self.info_logger.info("Single key found")
                         else:
@@ -239,7 +245,9 @@ class KeyGeter(QWidget):
                             for k in key_strings:
                                 value.append(k)
                             cursor.execute(
-                                "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+                                "INSERT INTO pssh "
+                                "(pssh, license_url, movie_name) "
+                                "VALUES (?, ?, ?)", (pssh, license_url, name))
 
                             conn.commit()
                             pssh_id = cursor.lastrowid
@@ -247,19 +255,26 @@ class KeyGeter(QWidget):
                                 key = key_string.replace(
                                     '[', '').replace(']', '').replace("'", "")
                                 cursor.execute(
-                                    "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
+                                    "INSERT INTO keys (key, pssh_id) "
+                                    "VALUES (?, ?)",
+                                    (key, pssh_id)
+                                )
                     else:
                         key = keys
                         cursor.execute(
-                            "INSERT INTO pssh (pssh, license_url, movie_name) VALUES (?, ?, ?)", (pssh, license_url, name))
+                            "INSERT INTO pssh (pssh, license_url, movie_name) "
+                            "VALUES (?, ?, ?)",
+                            (pssh, license_url, name))
 
                         conn.commit()
                         pssh_id = cursor.lastrowid
                         cursor.execute(
-                            "INSERT INTO keys (key, pssh_id) VALUES (?, ?)", (key, pssh_id))
+                            "INSERT INTO keys (key, pssh_id) VALUES (?, ?)",
+                            (key, pssh_id)
+                        )
                         self.info_logger.info("Keys Found")
                 else:
-                    error_message = "No 'key' or 'keys' found in the JSON data."
+                    error_message = "No keys found in the JSON data."
                     show_error_message(self, error_message)
                     self.debug_logger.debug(error_message)
             elif response.status_code == 400:
@@ -292,6 +307,6 @@ class KeyGeter(QWidget):
                 formatted_str = f"--key {key_str}"
                 self.response_browser.setText(formatted_str)
             else:
-                error_message = "No keys to display."  # Customize this message as needed
+                error_message = "No keys to display."
                 # show_error_message(self, error_message)
                 self.debug_logger.debug(error_message)

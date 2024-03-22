@@ -127,7 +127,7 @@ class Decrypter(QWidget):
     def merger(self):
         folder_path = self.folder_path_lineedit.text()
         if os.path.exists(folder_path):
-            merge = self.file_merger(folder_path)
+            self.file_merger(folder_path)
             self.info_logger.info("Files Merged Succesfully")
         else:
             show_error_message(self, "No Folder Selected.")

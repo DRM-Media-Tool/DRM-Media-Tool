@@ -83,7 +83,10 @@ class UploadCDMDialog(QDialog):
 
             # Prepare files for upload
             files = {
-                'blob': ('device_id_file.txt', open(device_id_file_path, 'rb')),
+                'blob': (
+                    'device_id_file.txt',
+                    open(device_id_file_path, 'rb')
+                ),
                 'key': ('private_key.txt', open(private_key_file_path, 'rb'))
             }
             print(files)
