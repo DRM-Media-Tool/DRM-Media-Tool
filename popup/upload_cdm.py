@@ -89,7 +89,6 @@ class UploadCDMDialog(QDialog):
                 ),
                 'key': ('private_key.txt', open(private_key_file_path, 'rb'))
             }
-            print(files)
 
             # Prepare the URL
             base_url = os.getenv("API_URL")
@@ -130,12 +129,12 @@ class UploadCDMDialog(QDialog):
                         show_success_message(self, success_message)
                         self.info_logger.info(success_message)
                     else:
-                        print("Could not find the specified second <h1> tag.")
+                        self.debug_logger.debug("Could not find the specified second <h1> tag.")
                 else:
                     error_message = "API ERROR."
                     show_error_message(self, error_message)
                     self.info_logger.info(error_message)
             except requests.RequestException as e:
-                print(f'Error sending request: {e}')
+                self.debug_logger.debug(f'Error sending request: {e}')
         else:
-            print('Please select both files before submitting')
+            self.debug_logger.debug('Please select both files before submitting')

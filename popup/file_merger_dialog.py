@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QCheckBox
 )
+from PyQt5.QtGui import QIcon
 import os
 import json
 import subprocess
@@ -18,6 +19,9 @@ from helper.message import show_error_message, show_success_message
 
 current_dir = os.path.dirname(sys.executable)
 ffmpeg_path = os.path.join(current_dir, 'binaries', 'ffmpeg ')
+data = os.path.dirname(os.path.abspath(__file__))
+icon = os.path.join(data, 'assets', 'logo.ico')
+print(current_dir, icon)
 
 
 def sanitize_filename(filename):
@@ -31,6 +35,7 @@ class FileMergerDialog(QDialog):
         self.folder_path = folder_path
 
         self.setWindowTitle("Files Merger")
+        self.setWindowIcon(QIcon(icon))
         self.setGeometry(100, 100, 600, 300)
 
         self.layout = QVBoxLayout()
@@ -161,7 +166,7 @@ class FileMergerDialog(QDialog):
             if img_files:
                 thumbnail_file = os.path.join(self.folder_path, img_files[0])
             else:
-                print("No matching files found.")
+                # print("No matching files found.")
                 self.debug_logger.debug("No matching files found.")
 
             # Build the ffmpeg command

@@ -235,7 +235,7 @@ class Decrypter(QWidget):
                     decrypt_command.extend(["--key", key[0]])
             decrypt_command.extend([input_file_path, output_file_path])
             try:
-                print(decrypt_command)
+                # print(decrypt_command)
                 subprocess.run(decrypt_command, shell=True, check=True)
                 self.search_result_list.addItem(
                     f"   Decrypted File: {decrypted_file}")
