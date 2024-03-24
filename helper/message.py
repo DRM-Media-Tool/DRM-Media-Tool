@@ -17,3 +17,14 @@ def show_success_message(parent, message):
     success_box.setText(message)
     success_box.setWindowIcon(parent.windowIcon())
     success_box.exec_()
+
+
+def show_confirmation_message(parent, title, message):
+    confirmation_box = QMessageBox()
+    confirmation_box.setIcon(QMessageBox.Question)
+    confirmation_box.setWindowTitle(title)
+    confirmation_box.setText(message)
+    confirmation_box.setWindowIcon(parent.windowIcon())
+    confirmation_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    confirmation_box.setDefaultButton(QMessageBox.No)
+    return confirmation_box.exec_()
