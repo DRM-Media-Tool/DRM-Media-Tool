@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QLabel,
     QLineEdit,
     QHBoxLayout,
     QPushButton,
     QTextBrowser,
     QPlainTextEdit,
-    QComboBox
+    QComboBox,
+    QFormLayout
 )
 import sqlite3
 import requests
@@ -33,16 +33,10 @@ class KeyGeter(QWidget):
         # Create layout
         layout = QVBoxLayout()
 
-        # Create labels and input fields
-        label1 = QLabel('PSSH:')
-        label2 = QLabel('Licence URL:')
-        label3 = QLabel('Name:')
-        label3.setToolTip('Name is to identify the key  for decryption')
-        label4 = QLabel('Headers:')
-        label4.setToolTip('Leave headers empty if not required')
-        label5 = QLabel('Proxy:')
-        label5.setToolTip('Leave Proxy empty if not required')
-        label6 = QLabel('Build Info:')
+        # Create a FormLayout
+        form_layout = QFormLayout()
+
+        # labels and input fields
         self.input1 = QLineEdit()
         self.input2 = QLineEdit()
         self.input3 = QLineEdit()
@@ -51,40 +45,21 @@ class KeyGeter(QWidget):
         self.input6 = QComboBox()
         self.populate_combo_box()
 
-        # To have input and lable on same line
-        row_layout1 = QHBoxLayout()
-        row_layout1.addWidget(label1)
-        row_layout1.addWidget(self.input1)
-        layout.addLayout(row_layout1)
+        # Add labels and inputs to the FormLayout
+        form_layout.addRow('PSSH:', self.input1)
+        form_layout.addRow('Licence URL:', self.input2)
+        form_layout.addRow('Name:', self.input3)
+        form_layout.addRow('Headers:', self.input4)
+        form_layout.addRow('Proxy:', self.input5)
+        form_layout.addRow('Build Info:', self.input6)
 
-        row_layout2 = QHBoxLayout()
-        row_layout2.addWidget(label2)
-        row_layout2.addWidget(self.input2)
-        layout.addLayout(row_layout2)
+        # Add the FormLayout to the main layout
+        layout.addLayout(form_layout)
 
-        row_layout3 = QHBoxLayout()
-        row_layout3.addWidget(label3)
-        row_layout3.addWidget(self.input3)
-        layout.addLayout(row_layout3)
-
-        vertical_layout = QVBoxLayout()
-        vertical_layout.addWidget(label4)
-        vertical_layout.addWidget(self.input4)
-        layout.addLayout(vertical_layout)
-
-        row_layout5 = QHBoxLayout()
-        row_layout5.addWidget(label5)
-        row_layout5.addWidget(self.input5)
-        layout.addLayout(row_layout5)
-
-        layout_label6 = QVBoxLayout()
-        layout_label6.addWidget(label6)
-        layout_label6.addWidget(self.input6)
-        layout.addLayout(layout_label6)
-
-        # Create a button
+        # Create a button layout
         buttons_layout = QHBoxLayout()
 
+        # Create buttons and connect them to slots
         submit_button = QPushButton('Submit')
         submit_button.clicked.connect(self.handle_submit_click)
         buttons_layout.addWidget(submit_button)
@@ -93,8 +68,7 @@ class KeyGeter(QWidget):
         upload_cdm_button.clicked.connect(self.handle_upload_cdm_click)
         buttons_layout.addWidget(upload_cdm_button)
 
-        # Set the layout for the main window
-        self.setLayout(layout)
+        # Add the buttons layout to the main layout
         layout.addLayout(buttons_layout)
 
         # Create a text browser to display the API response
@@ -103,7 +77,8 @@ class KeyGeter(QWidget):
         # Add the text browser to the layout
         layout.addWidget(self.response_browser)
 
-        self.show()
+        # Set the layout for the main window
+        self.setLayout(layout)
 
     def populate_combo_box(self):
         # Add an empty item as default

@@ -2,13 +2,12 @@ import os
 import requests
 from PyQt5.QtWidgets import (
     QDialog,
-    QVBoxLayout,
-    QGridLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QFileDialog,
-    QHBoxLayout
+    QHBoxLayout,
+    QFormLayout
 )
 from bs4 import BeautifulSoup
 from helper.message import show_error_message, show_success_message
@@ -25,38 +24,32 @@ class UploadCDMDialog(QDialog):
         self.setWindowTitle('Upload Your CDM')
         self.setGeometry(100, 100, 400, 200)
 
-        main_layout = QVBoxLayout()
+        main_layout = QFormLayout()
 
-        device_id_layout = QGridLayout()
-        device_id_layout.setSpacing(5)
-
+        device_id_layout = QHBoxLayout()
         device_id_label = QLabel('Device ID:')
         self.device_id_edit = QLineEdit()
         device_id_upload_button = QPushButton('Upload File')
         device_id_upload_button.clicked.connect(self.upload_device_id_file)
-        device_id_layout.addWidget(device_id_label, 1, 0)
-        device_id_layout.addWidget(self.device_id_edit, 1, 1)
-        device_id_layout.addWidget(device_id_upload_button, 1, 2)
+        device_id_layout.addWidget(device_id_label)
+        device_id_layout.addWidget(self.device_id_edit)
+        device_id_layout.addWidget(device_id_upload_button)
+        main_layout.addRow(device_id_layout)
 
-        private_key_layout = QGridLayout()
-        private_key_layout.setSpacing(5)
-
+        private_key_layout = QHBoxLayout()
         private_key_label = QLabel('Private Key:')
         self.private_key_edit = QLineEdit()
         private_key_upload_button = QPushButton('Upload File')
         private_key_upload_button.clicked.connect(self.upload_private_key_file)
-        private_key_layout.addWidget(private_key_label, 2, 0)
-        private_key_layout.addWidget(self.private_key_edit, 2, 1)
-        private_key_layout.addWidget(private_key_upload_button, 2, 2)
+        private_key_layout.addWidget(private_key_label)
+        private_key_layout.addWidget(self.private_key_edit)
+        private_key_layout.addWidget(private_key_upload_button)
+        main_layout.addRow(private_key_layout)
 
-        submit_layout = QHBoxLayout()
         submit_button = QPushButton('Submit')
         submit_button.clicked.connect(self.handle_submit_click)
-        submit_layout.addWidget(submit_button)
+        main_layout.addRow(submit_button)
 
-        main_layout.addLayout(device_id_layout)
-        main_layout.addLayout(private_key_layout)
-        main_layout.addLayout(submit_layout)
         self.setLayout(main_layout)
 
     def upload_device_id_file(self):
@@ -89,7 +82,6 @@ class UploadCDMDialog(QDialog):
                 ),
                 'key': ('private_key.txt', open(private_key_file_path, 'rb'))
             }
-            print(files)
 
             # Prepare the URL
             base_url = os.getenv("API_URL")
@@ -130,12 +122,14 @@ class UploadCDMDialog(QDialog):
                         show_success_message(self, success_message)
                         self.info_logger.info(success_message)
                     else:
-                        print("Could not find the specified second <h1> tag.")
+                        self.debug_logger.debug("Could not find the "
+                                                "specified Build Info.")
                 else:
                     error_message = "API ERROR."
                     show_error_message(self, error_message)
                     self.info_logger.info(error_message)
             except requests.RequestException as e:
-                print(f'Error sending request: {e}')
+                self.debug_logger.debug(f'Error sending request: {e}')
         else:
-            print('Please select both files before submitting')
+            self.debug_logger.debug(
+                'Please select both files before submitting')
