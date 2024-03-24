@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import (
     QTextBrowser,
     QPlainTextEdit,
     QComboBox,
-    QFormLayout
+    QFormLayout,
+    QCheckBox
 )
 import sqlite3
 import requests
@@ -55,6 +56,10 @@ class KeyGeter(QWidget):
 
         # Add the FormLayout to the main layout
         layout.addLayout(form_layout)
+
+        self.force_checkbox = QCheckBox("Force")
+        self.force_checkbox.setChecked(True)
+        layout.addWidget(self.force_checkbox)
 
         # Create a button layout
         buttons_layout = QHBoxLayout()
@@ -111,6 +116,8 @@ class KeyGeter(QWidget):
     def handle_submit_click(self):
         self.info_logger.info("Submit Button Clicked")
         # Get user input from the input fields
+        force_checked = self.force_checkbox.isChecked()
+        self.info_logger.info(f"check box status {force_checked}")
         pssh = self.input1.text()
         license_url = self.input2.text()
         name = self.input3.text()
@@ -175,7 +182,7 @@ class KeyGeter(QWidget):
                 "pssh": pssh,
                 "proxy": proxy,
                 "headers": header,
-                "force": True,
+                "force": force_checked,
                 "buildInfo": Build_info
             }
 
