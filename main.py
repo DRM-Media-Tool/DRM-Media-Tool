@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from key_getter import KeyGeter
 from decrypter import Decrypter
+from keys import Keys
 from list_cdm import Cdm
 from logger import setup_logging
 import platform
@@ -72,11 +73,13 @@ class MainWindow(QMainWindow):
         Key_Geter = KeyGeter(debug_logger, info_logger)
         media_tools = Decrypter(debug_logger, info_logger)
         list_cdm = Cdm(debug_logger, info_logger)
+        enter_keys = Keys(debug_logger, info_logger)
 
         # Add tabs to the tab widget
         tab_widget.addTab(Key_Geter, "Key Graber")
         tab_widget.addTab(media_tools, "Decrypter & Merger")
         tab_widget.addTab(list_cdm, "List CDM")
+        tab_widget.addTab(enter_keys, "Add Keys")
 
         # Set the central widget to be the tab widget
         self.setCentralWidget(tab_widget)
