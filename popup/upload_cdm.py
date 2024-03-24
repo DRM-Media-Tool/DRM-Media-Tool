@@ -29,7 +29,7 @@ class UploadCDMDialog(QDialog):
         device_id_layout = QHBoxLayout()
         device_id_label = QLabel('Device ID:')
         self.device_id_edit = QLineEdit()
-        device_id_upload_button = QPushButton('Upload File')
+        device_id_upload_button = QPushButton('Select File')
         device_id_upload_button.clicked.connect(self.upload_device_id_file)
         device_id_layout.addWidget(device_id_label)
         device_id_layout.addWidget(self.device_id_edit)
@@ -39,7 +39,7 @@ class UploadCDMDialog(QDialog):
         private_key_layout = QHBoxLayout()
         private_key_label = QLabel('Private Key:')
         self.private_key_edit = QLineEdit()
-        private_key_upload_button = QPushButton('Upload File')
+        private_key_upload_button = QPushButton('Select File')
         private_key_upload_button.clicked.connect(self.upload_private_key_file)
         private_key_layout.addWidget(private_key_label)
         private_key_layout.addWidget(self.private_key_edit)
@@ -69,6 +69,12 @@ class UploadCDMDialog(QDialog):
     def handle_submit_click(self):
         device_id_file_path = self.device_id_edit.text()
         private_key_file_path = self.private_key_edit.text()
+
+        if not device_id_file_path or not private_key_file_path:
+            error_message = "Both 'client_id' and 'private_key' "
+            "must be provided."
+            show_error_message(self, error_message)
+            self.debug_logger.debug(error_message)
 
         if device_id_file_path and private_key_file_path:
             # Prepare headers with X-API-Key
