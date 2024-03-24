@@ -21,7 +21,6 @@ current_dir = os.path.dirname(sys.executable)
 ffmpeg_path = os.path.join(current_dir, 'binaries', 'ffmpeg ')
 data = os.path.dirname(os.path.abspath(__file__))
 icon = os.path.join(data, 'assets', 'logo.ico')
-print(current_dir, icon)
 
 
 def sanitize_filename(filename):

@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from key_getter import KeyGeter
 from decrypter import Decrypter
+from list_cdm import Cdm
 from logger import setup_logging
 import platform
 import webbrowser
@@ -68,12 +69,14 @@ class MainWindow(QMainWindow):
         help_menu.addAction(open_discord_action)
 
         # Create tabs
-        hello_tab = KeyGeter(debug_logger, info_logger)
-        file_lister_tab = Decrypter(debug_logger, info_logger)
+        Key_Geter = KeyGeter(debug_logger, info_logger)
+        media_tools = Decrypter(debug_logger, info_logger)
+        list_cdm = Cdm(debug_logger, info_logger)
 
         # Add tabs to the tab widget
-        tab_widget.addTab(hello_tab, "Key Graber")
-        tab_widget.addTab(file_lister_tab, "Decrypter & Merger")
+        tab_widget.addTab(Key_Geter, "Key Graber")
+        tab_widget.addTab(media_tools, "Decrypter & Merger")
+        tab_widget.addTab(list_cdm, "List CDM")
 
         # Set the central widget to be the tab widget
         self.setCentralWidget(tab_widget)
